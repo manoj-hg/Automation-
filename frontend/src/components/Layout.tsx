@@ -1,15 +1,12 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Newspaper, 
-  Bot, 
-  FileEdit, 
+  Rss, 
   CheckSquare, 
-  Calendar, 
-  Send, 
-  BarChart2, 
-  Database, 
-  Settings 
+  Bot,
+  Menu,
+  X
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -18,75 +15,80 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const navItems = [
-  { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'News Feed', path: '/news', icon: Newspaper },
-  { name: 'AI Agents', path: '/agents', icon: Bot },
-  { name: 'Drafts', path: '/drafts', icon: FileEdit },
-  { name: 'Approval Queue', path: '/approvals', icon: CheckSquare },
-  { name: 'Scheduler', path: '/scheduler', icon: Calendar },
-  { name: 'Published', path: '/published', icon: Send },
-  { name: 'Analytics', path: '/analytics', icon: BarChart2 },
-  { name: 'Sources', path: '/sources', icon: Database },
-  { name: 'Settings', path: '/settings', icon: Settings },
+const navigation = [
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'News Feed', href: '/news', icon: Rss },
+  { name: 'Approval Queue', href: '/approval', icon: CheckSquare },
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
   return (
     <div className="min-h-screen bg-[#0f1117] flex">
+      {/* Mobile sidebar toggle */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#1e212b] border-b border-[#334155] z-50 flex items-center px-4">
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="text-slate-400 hover:text-white"
+        >
+          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+        <div className="flex items-center ml-4 text-blue-500">
+          <Bot className="w-6 h-6 mr-2" />
+          <span className="font-bold text-white tracking-tight">TechDose <span className="text-blue-500">AI</span></span>
+        </div>
+      </div>
+
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1e212b] border-r border-[#334155] flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-[#334155]">
-          <Bot className="w-8 h-8 text-blue-500 mr-2" />
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-40 w-64 bg-[#1e212b] border-r border-[#334155] transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:block",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="h-16 flex items-center px-6 border-b border-[#334155] hidden lg:flex text-blue-500">
+          <Bot className="w-8 h-8 mr-2" />
           <span className="text-xl font-bold text-white tracking-tight">TechDose <span className="text-blue-500">AI</span></span>
         </div>
-        
-        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            
+
+        <nav className="p-4 space-y-1">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-3 mt-4">
+            Live System
+          </div>
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
             return (
               <Link
                 key={item.name}
-                to={item.path}
+                to={item.href}
+                onClick={() => setSidebarOpen(false)}
                 className={cn(
                   "flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                   isActive 
                     ? "bg-blue-600/10 text-blue-500" 
-                    : "text-slate-400 hover:bg-[#334155]/50 hover:text-white"
+                    : "text-slate-400 hover:bg-[#334155] hover:text-white"
                 )}
               >
-                <Icon className={cn("w-5 h-5 mr-3", isActive ? "text-blue-500" : "text-slate-500")} />
+                <item.icon className={cn("w-5 h-5 mr-3", isActive ? "text-blue-500" : "text-slate-400")} />
                 {item.name}
               </Link>
             );
           })}
         </nav>
-      </aside>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
-        <header className="h-16 bg-[#1e212b] border-b border-[#334155] flex items-center justify-between px-6 shrink-0">
-          <div className="flex items-center bg-[#0f1117] rounded-full px-4 py-1.5 border border-[#334155]">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-            <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Demo Mode Active</span>
+      {/* Main content */}
+      <main className="flex-1 lg:pl-0 pt-16 lg:pt-0 overflow-y-auto">
+        <div className="h-16 border-b border-[#334155] bg-[#1e212b]/50 flex items-center justify-end px-8 hidden lg:flex">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+              System Online
+            </span>
           </div>
-          
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-slate-400 hover:text-white transition-colors rounded-full hover:bg-[#334155]/50">
-              <Settings className="w-5 h-5" />
-            </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500"></div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="flex-1 overflow-y-auto p-8">
-          {children}
+        </div>
+        <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+          <Outlet />
         </div>
       </main>
     </div>
