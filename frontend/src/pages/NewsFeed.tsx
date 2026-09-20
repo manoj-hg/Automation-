@@ -97,9 +97,16 @@ export default function NewsFeed() {
                 <div className="flex flex-col gap-2 ml-4">
                   <button 
                     onClick={async () => {
-                      alert("Generating draft...");
-                      await fetch(`${API_URL}/news/${item.id}/generate-draft`, { method: 'POST' });
-                      alert("Draft generated! Check the Approval Queue.");
+                      try {
+                        const res = await fetch(`${API_URL}/news/${item.id}/generate-draft`, { method: 'POST' });
+                        if (res.ok) {
+                          alert("Draft generated! Check the Approval Queue.");
+                        } else {
+                          alert("Failed to generate draft. Backend returned an error.");
+                        }
+                      } catch (e) {
+                        alert("Network error occurred.");
+                      }
                     }}
                     className="p-2 text-slate-400 hover:text-white bg-[#0f1117] hover:bg-blue-600 rounded-lg transition-colors border border-[#334155] hover:border-blue-600 group"
                   >

@@ -64,7 +64,7 @@ async def collect_news(background_tasks: BackgroundTasks):
 from app.services.agents.writer import writer_agent
 
 @router.post("/{article_id}/generate-draft")
-async def generate_draft(article_id: int):
+async def generate_draft(article_id: str):
     # Fetch article
     response = supabase_db.table("news_articles").select("*").eq("id", article_id).execute()
     if not response.data:
