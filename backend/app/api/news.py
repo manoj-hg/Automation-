@@ -60,3 +60,34 @@ async def collect_news(background_tasks: BackgroundTasks):
 
     background_tasks.add_task(fetch_and_store)
     return {"status": "ok", "message": "News collection started in the background."}
+
+from app.services.agents.writer import writer_agent
+
+@router.post("/{article_id}/generate-draft")
+async def generate_draft(article_id: int):
+    # Fetch article
+    response = supabase_db.table("news_articles").select("*").eq("id", article_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Article not found")
+        
+    article = response.data[0]
+    
+    # Run Writer Agent
+    draft_result = writer_agent.create_draft(
+        facts=[article.get("title")], 
+        summary=article.get("content")[:500], 
+        url=article.get("url")
+    )
+    
+    # Save to Drafts
+    draft_data = {
+        "headline": draft_result.headline,
+        "content": draft_result.content,
+        "status": "PENDING_APPROVAL",
+        "story_group_id": article.get("story_group_id")
+    }
+    
+    supabase_db.table("draft_posts").insert(draft_data).execute()
+    
+    return {"status": "ok", "message": "Draft generated successfully!"}
+

@@ -95,7 +95,14 @@ export default function NewsFeed() {
                 </div>
                 
                 <div className="flex flex-col gap-2 ml-4">
-                  <button className="p-2 text-slate-400 hover:text-white bg-[#0f1117] hover:bg-blue-600 rounded-lg transition-colors border border-[#334155] hover:border-blue-600 group">
+                  <button 
+                    onClick={async () => {
+                      alert("Generating draft...");
+                      await fetch(`${API_URL}/news/${item.id}/generate-draft`, { method: 'POST' });
+                      alert("Draft generated! Check the Approval Queue.");
+                    }}
+                    className="p-2 text-slate-400 hover:text-white bg-[#0f1117] hover:bg-blue-600 rounded-lg transition-colors border border-[#334155] hover:border-blue-600 group"
+                  >
                     <Bot className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   </button>
                   <a href={item.url} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-white bg-[#0f1117] hover:bg-[#334155] rounded-lg transition-colors border border-[#334155]">
