@@ -1,4 +1,4 @@
-import { Search, Filter, ExternalLink, Bot, Check, AlertCircle } from 'lucide-react';
+import { Search, Filter, ExternalLink, Bot, AlertCircle } from 'lucide-react';
 import { cn } from '../components/Layout';
 
 const mockNews = [
